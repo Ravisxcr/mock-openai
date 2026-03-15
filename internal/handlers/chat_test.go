@@ -10,8 +10,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	// "github.com/youruser/mock-openai/internal/chat" // Update this path
-	"mock-openai/internal/models"
 	"github.com/stretchr/testify/assert"
+	"mock-openai/internal/models"
 )
 
 func TestHandleChatConcurrency(t *testing.T) {
@@ -48,7 +48,7 @@ func TestHandleChatConcurrency(t *testing.T) {
 
 			// Assertions
 			assert.Equal(t, http.StatusOK, w.Code)
-			
+
 			var response models.ChatResponse
 			err := json.Unmarshal(w.Body.Bytes(), &response)
 			assert.NoError(t, err)
@@ -59,4 +59,3 @@ func TestHandleChatConcurrency(t *testing.T) {
 	// 5. Wait for all goroutines to finish
 	wg.Wait()
 }
-

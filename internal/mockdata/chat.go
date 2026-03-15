@@ -32,7 +32,6 @@ func GenerateMockChatResponse(modelName string, content string) models.ChatRespo
 	}
 }
 
-
 // GenerateLegacyCompletion returns the non-chat format response
 func GenerateLegacyCompletion(model string) gin.H {
 	return gin.H{

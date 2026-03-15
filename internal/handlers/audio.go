@@ -1,9 +1,9 @@
 package handlers
 
 import (
+	"encoding/base64"
 	"net/http"
 	"time"
-	"encoding/base64"
 
 	"github.com/gin-gonic/gin"
 	"mock-openai/internal/models"
@@ -33,7 +33,7 @@ func HandleAudioSpeech(c *gin.Context) {
 	// Set the correct header so the client knows it is receiving an MP3
 	c.Header("Content-Type", "audio/mpeg")
 	c.Header("Content-Length", string(len(audioBytes)))
-	
+
 	// Send the binary data
 	c.Data(http.StatusOK, "audio/mpeg", audioBytes)
 }

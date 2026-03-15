@@ -1,10 +1,10 @@
 package handlers
 
 import (
-	"net/http"
 	"github.com/gin-gonic/gin"
-	"mock-openai/internal/models"
 	"mock-openai/internal/mockdata"
+	"mock-openai/internal/models"
+	"net/http"
 )
 
 // POST /v1/images/generations

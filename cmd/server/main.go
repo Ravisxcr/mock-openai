@@ -3,10 +3,15 @@ package main
 import (
 	"log"
 
-	"mock-openai/internal/router" // Update this path
+	"mock-openai/internal/database" // Update this path
+	"mock-openai/internal/router"   // Update this path
 )
 
 func main() {
+	database.InitDB("mock_openai.db")
+	// 3. Ensure the DB connection closes when the program exits
+	defer database.CloseDB()
+
 	// 1. Initialize the router
 	r := router.SetupRouter()
 

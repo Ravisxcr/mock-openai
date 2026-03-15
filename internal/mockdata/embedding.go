@@ -19,7 +19,7 @@ func GenerateMockEmbedding() []float64 {
 
 func GenerateMockEmbeddingResponse(model string, input interface{}) models.EmbeddingResponse {
 	var data []models.EmbeddingData
-	
+
 	// Type assertion to check if input is a string or a slice
 	switch v := input.(type) {
 	case string:

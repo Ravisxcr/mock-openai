@@ -1,8 +1,8 @@
 package mockdata
 
 import (
-	"time"
 	"mock-openai/internal/models"
+	"time"
 )
 
 func GenerateMockImageResponse(model string, prompt string) models.ImageResponse {
@@ -11,7 +11,7 @@ func GenerateMockImageResponse(model string, prompt string) models.ImageResponse
 		Data: []models.ImageData{
 			{
 				// Using a placeholder service to simulate a generated image
-				URL: "https://picsum.photos/1024", 
+				URL:           "https://picsum.photos/1024",
 				RevisedPrompt: "A high-resolution version of: " + prompt,
 			},
 		},

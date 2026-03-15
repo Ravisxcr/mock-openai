@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"mock-openai/internal/models" // Update this path
 	"mock-openai/internal/mockdata" // Update this path
+	"mock-openai/internal/models"   // Update this path
 )
 
 // HandleChatCompletions mimics the OpenAI Chat API logic.
@@ -27,7 +27,6 @@ func HandleChatCompletions(c *gin.Context) {
 
 	res := mockdata.GenerateMockChatResponse(req.Model, content)
 
-
 	c.JSON(http.StatusOK, res)
 }
 
@@ -45,14 +44,13 @@ func HandleModel(c *gin.Context) {
 	modelID := c.Param("model_id")
 	// For simplicity, we return the same details for any model ID
 	c.JSON(http.StatusOK, gin.H{
-		"id":         modelID,
-		"object":     "model",
-		"created":    1677610602,
-		"owned_by":   "openai",
+		"id":          modelID,
+		"object":      "model",
+		"created":     1677610602,
+		"owned_by":    "openai",
 		"description": "This is a mock model description for " + modelID,
 	})
 }
-
 
 // HandleChat processes incoming chat completion requests.
 func HandleChat(c *gin.Context) {
@@ -130,16 +128,6 @@ func HandleChatCompletion(c *gin.Context) {
 	// Send the JSON response with a 200 OK status
 	c.JSON(http.StatusOK, resp)
 }
-
-
-
-
-
-
-
-
-
-
 
 // POST /v1/completions
 func HandleLegacyCompletions(c *gin.Context) {

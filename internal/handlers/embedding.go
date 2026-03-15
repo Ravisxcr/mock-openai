@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"mock-openai/internal/models" // Update this path
 	"mock-openai/internal/mockdata" // Update this path
+	"mock-openai/internal/models"   // Update this path
 )
 
 func HandleEmbeddings(c *gin.Context) {
@@ -19,7 +19,7 @@ func HandleEmbeddings(c *gin.Context) {
 
 	// Build the OpenAI-compatible response
 	resp := mockdata.GenerateMockEmbeddingResponse(req.Model, req.Input)
-		
+
 	// Send the JSON response with a 200 OK status
 	c.JSON(http.StatusOK, resp)
 }
