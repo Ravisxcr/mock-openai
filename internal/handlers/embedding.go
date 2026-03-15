@@ -18,7 +18,7 @@ func HandleEmbeddings(c *gin.Context) {
 	}
 
 	// Build the OpenAI-compatible response
-	resp := mockdata.GenerateMockEmbeddingResponse("text-embedding-3-small", req.Input)
+	resp := mockdata.GenerateMockEmbeddingResponse(req.Model, req.Input)
 		
 	// Send the JSON response with a 200 OK status
 	c.JSON(http.StatusOK, resp)

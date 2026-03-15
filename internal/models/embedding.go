@@ -2,7 +2,7 @@ package models
 
 // EmbeddingRequest represents the incoming JSON body for embedding requests.
 type EmbeddingRequest struct {
-	Input []string `json:"input"`
+	Input interface{} `json:"input"`
 	Model string   `json:"model"`
 }
 
@@ -18,4 +18,5 @@ type EmbeddingResponse struct {
 	Object string          `json:"object"`
 	Data   []EmbeddingData `json:"data"`
 	Model  string          `json:"model"`
+	Usage   UsageStats      `json:"usage"`
 }

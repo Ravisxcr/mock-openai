@@ -1,33 +1,51 @@
 package mockdata
 
 import (
-	"math/rand"
-	"time"
+	"math/rand/v2"
 
 	"mock-openai/internal/models"
 )
 
-func GenerateMockEmbeddingResponse(modelName string, input []string) models.EmbeddingResponse {
+func GenerateMockEmbedding() []float64 {
 	const dimensions = 1536
 	vector := make([]float64, dimensions)
 
-	// Seed the random number generator
-	r := rand.New(rand.NewSource(time.Now().UnixNano()))
-
 	for i := 0; i < dimensions; i++ {
-		// OpenAI embeddings are usually normalized between -1 and 1
-		vector[i] = r.Float64()*2 - 1 
+		vector[i] = rand.Float64()*2 - 1
+	}
+
+	return vector
+}
+
+func GenerateMockEmbeddingResponse(model string, input interface{}) models.EmbeddingResponse {
+	var data []models.EmbeddingData
+	
+	// Type assertion to check if input is a string or a slice
+	switch v := input.(type) {
+	case string:
+		// Single string -> One embedding
+		data = append(data, models.EmbeddingData{
+			Object:    "embedding",
+			Index:     0,
+			Embedding: GenerateMockEmbedding(), // Your 1536-dim function
+		})
+	case []interface{}:
+		// JSON array of strings -> Multiple embeddings
+		for i := range v {
+			data = append(data, models.EmbeddingData{
+				Object:    "embedding",
+				Index:     i,
+				Embedding: GenerateMockEmbedding(),
+			})
+		}
 	}
 
 	return models.EmbeddingResponse{
 		Object: "list",
-		Data: []models.EmbeddingData{
-			{
-				Object:    "embedding",
-				Embedding: vector,
-				Index:     0,
-			},
+		Data:   data,
+		Model:  model,
+		Usage: models.UsageStats{
+			TotalTokens: 15, // Mock static usage
 		},
-		Model: modelName,
 	}
 }

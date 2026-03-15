@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 	"time"
+	"encoding/base64"
 
 	"github.com/gin-gonic/gin"
 	"mock-openai/internal/models"
@@ -20,10 +21,21 @@ func HandleAudioTranslation(c *gin.Context) {
 
 // POST /v1/audio/speech
 func HandleAudioSpeech(c *gin.Context) {
-	// OpenAI returns binary audio data (MP3/WAV)
+	// In a real project, you could load this from a .mp3 file in your assets folder
+	const mockAudioBase64 = `SUQzBAAAAAAAF1RTU0UAAAANAAADTGFtZTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/4xAAYAAAaA8AAAACAAAnS`
+
+	audioBytes, err := base64.StdEncoding.DecodeString(mockAudioBase64)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate mock audio"})
+		return
+	}
+
+	// Set the correct header so the client knows it is receiving an MP3
 	c.Header("Content-Type", "audio/mpeg")
-	// Return a tiny 1-second silence or empty byte slice for mocking
-	c.Data(http.StatusOK, "audio/mpeg", []byte{0x00}) 
+	c.Header("Content-Length", string(len(audioBytes)))
+	
+	// Send the binary data
+	c.Data(http.StatusOK, "audio/mpeg", audioBytes)
 }
 
 // Voice Consent Handlers
