@@ -2,7 +2,7 @@
 BINARY_NAME=mock-openai
 MAIN_PATH=cmd/server/main.go
 
-.PHONY: all run tidy test clean build help
+.PHONY: all run tidy test clean build swagger help
 
 ## help: Show this help message
 help:
@@ -31,3 +31,7 @@ build:
 ## clean: Remove compiled binaries
 clean:
 	rm -f $(BINARY_NAME)
+
+## swagger: Regenerate Swagger/OpenAPI docs (docs/) from handler annotations
+swagger:
+	go run github.com/swaggo/swag/cmd/swag@v1.16.6 init -g $(MAIN_PATH) -o docs --parseInternal
