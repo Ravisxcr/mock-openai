@@ -2,6 +2,7 @@ package mockdata
 
 import (
 	"crypto/rand"
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -40,7 +41,7 @@ func replyContent(messages []models.ChatMessage) string {
 		return "This is a mock response from your Go server."
 	}
 	last := messages[len(messages)-1]
-	return fmt.Sprintf("Mock response to your %s message: %s", last.Role, last.Content)
+	return fmt.Sprintf("Mock response to your %s message: %s", last.Role, last.Content.Flatten())
 }
 
 // truncateToTokens trims content to roughly maxTokens tokens (using the
@@ -94,7 +95,7 @@ func BuildChatResponse(req models.ChatRequest) models.ChatResponse {
 
 	promptText := make([]string, 0, len(req.Messages))
 	for _, m := range req.Messages {
-		promptText = append(promptText, m.Content)
+		promptText = append(promptText, m.Content.Flatten())
 	}
 	promptTokens := estimateTokens(strings.Join(promptText, " "))
 	maxTokens := effectiveMaxTokens(req)
@@ -103,6 +104,24 @@ func BuildChatResponse(req models.ChatRequest) models.ChatResponse {
 	choices := make([]models.ChatChoice, n)
 	completionTokens := 0
 	for i := 0; i < n; i++ {
+		if toolCalls := BuildToolCalls(req); len(toolCalls) > 0 {
+			encoded, _ := json.Marshal(toolCalls)
+			completionTokens += estimateTokens(string(encoded))
+			choices[i] = models.ChatChoice{
+				Index: i,
+				Message: models.ChatResponseMessage{
+					Role:        "assistant",
+					Content:     nil,
+					Refusal:     nil,
+					Annotations: []interface{}{},
+					ToolCalls:   toolCalls,
+				},
+				Logprobs:     nil,
+				FinishReason: "tool_calls",
+			}
+			continue
+		}
+
 		content := base
 		finish := "stop"
 		if maxTokens != nil {
@@ -170,6 +189,31 @@ func BuildStreamChunks(resp models.ChatResponse, includeUsage bool) []models.Cha
 			Logprobs: nil,
 		}}
 		chunks = append(chunks, roleChunk)
+
+		if len(choice.Message.ToolCalls) > 0 {
+			for i, tc := range choice.Message.ToolCalls {
+				idx := i
+				tc.Index = &idx
+				deltaChunk := base()
+				deltaChunk.Choices = []models.ChatStreamChoice{{
+					Index:    choice.Index,
+					Delta:    models.ChatStreamDelta{ToolCalls: []models.ToolCall{tc}},
+					Logprobs: nil,
+				}}
+				chunks = append(chunks, deltaChunk)
+			}
+
+			finishReason := choice.FinishReason
+			finishChunk := base()
+			finishChunk.Choices = []models.ChatStreamChoice{{
+				Index:        choice.Index,
+				Delta:        models.ChatStreamDelta{},
+				Logprobs:     nil,
+				FinishReason: &finishReason,
+			}}
+			chunks = append(chunks, finishChunk)
+			continue
+		}
 
 		content := ""
 		if choice.Message.Content != nil {

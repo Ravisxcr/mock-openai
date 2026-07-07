@@ -28,6 +28,30 @@ func HandleChatCompletions(c *gin.Context) {
 		apierror.InvalidRequest(c, "'messages' must contain at least one item", "messages")
 		return
 	}
+	if len(req.ToolChoice) > 0 || len(req.Tools) > 0 {
+		mode, functionName, err := mockdata.ParseToolChoice(req.ToolChoice, len(req.Tools) > 0)
+		if err != nil {
+			apierror.InvalidRequest(c, "Invalid value for 'tool_choice': "+err.Error(), "tool_choice")
+			return
+		}
+		if len(req.ToolChoice) > 0 && len(req.Tools) == 0 && mode != "none" {
+			apierror.InvalidRequest(c, "'tool_choice' is only allowed when 'tools' are specified.", "tool_choice")
+			return
+		}
+		if mode == "function" {
+			found := false
+			for _, t := range req.Tools {
+				if t.Function.Name == functionName {
+					found = true
+					break
+				}
+			}
+			if !found {
+				apierror.InvalidRequest(c, fmt.Sprintf("Invalid value for 'tool_choice': function '%s' does not exist. Please check your 'tools' array.", functionName), "tool_choice")
+				return
+			}
+		}
+	}
 
 	resp := mockdata.BuildChatResponse(req)
 	store.SaveCompletion(resp)
