@@ -18,7 +18,7 @@ func TestHandleChatConcurrency(t *testing.T) {
 	// 1. Setup Gin in Test Mode
 	gin.SetMode(gin.TestMode)
 	router := gin.New()
-	router.POST("/v1/chat/completions", HandleChat)
+	router.POST("/v1/chat/completions", HandleChatCompletions)
 
 	// 2. Configuration for the test
 	const concurrentRequests = 100

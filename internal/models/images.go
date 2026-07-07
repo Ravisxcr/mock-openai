@@ -1,16 +1,18 @@
 package models
 
-// ImageRequest covers the basic prompt-based generation
+// ImageRequest covers dall-e-2/dall-e-3 prompt-based generation.
 type ImageRequest struct {
 	Prompt         string `json:"prompt"`
 	Model          string `json:"model"`
 	N              int    `json:"n"`
+	Quality        string `json:"quality"`
 	Size           string `json:"size"`
+	Style          string `json:"style"`
 	ResponseFormat string `json:"response_format"`
 	User           string `json:"user"`
 }
 
-// ImageResponse is the standard wrapper for image results
+// ImageResponse is the standard wrapper for image results (ImagesResponse schema).
 type ImageResponse struct {
 	Created int64       `json:"created"`
 	Data    []ImageData `json:"data"`

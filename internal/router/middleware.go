@@ -1,46 +1,36 @@
 package router
 
 import (
-	"net/http"
 	"strings"
 	"time"
 
+	"mock-openai/internal/apierror"
 	"mock-openai/internal/database" // Import your db package
 
 	"github.com/gin-gonic/gin"
 )
 
-// AuthMiddleware checks for a Bearer token in the Authorization header
+// AuthMiddleware checks for a Bearer token in the Authorization header.
+// Any non-empty token is accepted — this is a mock server, not a real
+// key validator — but the presence/shape check matches real API behavior.
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 
-		// 1. Check if header exists
 		if authHeader == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization header is required"})
-			c.Abort() // Stops the request from reaching your handlers
+			apierror.Respond(c, 401, "invalid_request_error",
+				"You didn't provide an API key. You need to provide your API key in an Authorization header using Bearer auth (i.e. Authorization: Bearer YOUR_KEY).",
+				"", "")
 			return
 		}
 
-		// 2. Check for "Bearer " prefix
-		parts := strings.Split(authHeader, " ")
-		if len(parts) != 2 || parts[0] != "Bearer" {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization header must be in 'Bearer <token>' format"})
-			c.Abort()
+		parts := strings.SplitN(authHeader, " ", 2)
+		if len(parts) != 2 || parts[0] != "Bearer" || parts[1] == "" {
+			apierror.Respond(c, 401, "invalid_request_error",
+				"Authorization header must be in the format 'Bearer <token>'.", "", "")
 			return
 		}
 
-		// 3. Validate the token
-		// For a mock server, we can accept any token (like 'mock-key')
-		// or check for a specific one.
-		token := parts[1]
-		if token == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
-			c.Abort()
-			return
-		}
-
-		// If everything is fine, call Next() to proceed to the handler
 		c.Next()
 	}
 }

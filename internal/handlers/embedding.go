@@ -4,22 +4,27 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"mock-openai/internal/mockdata" // Update this path
-	"mock-openai/internal/models"   // Update this path
+	"mock-openai/internal/apierror"
+	"mock-openai/internal/mockdata"
+	"mock-openai/internal/models"
 )
 
+// POST /v1/embeddings
 func HandleEmbeddings(c *gin.Context) {
 	var req models.EmbeddingRequest
-
-	// Bind the incoming JSON to our struct
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		apierror.InvalidRequest(c, "Invalid request body: "+err.Error(), "")
+		return
+	}
+	if req.Model == "" {
+		apierror.InvalidRequest(c, "you must provide a model parameter", "model")
+		return
+	}
+	if req.Input == nil {
+		apierror.InvalidRequest(c, "you must provide an input parameter", "input")
 		return
 	}
 
-	// Build the OpenAI-compatible response
-	resp := mockdata.GenerateMockEmbeddingResponse(req.Model, req.Input)
-
-	// Send the JSON response with a 200 OK status
+	resp := mockdata.GenerateMockEmbeddingResponse(req)
 	c.JSON(http.StatusOK, resp)
 }

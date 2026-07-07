@@ -2,6 +2,8 @@
 
 A high-performance, lightweight mock of the OpenAI API built in **Go** using the **Gin** framework. This server is designed for local development and integration testing, allowing you to build and test AI-powered applications without spending a dime on API credits.
 
+Response shapes are kept in sync with the official OpenAI OpenAPI spec (`openai.yml`, vendored in this repo). See `memory.md` for the current fidelity status of each API area and known deviations from the real API.
+
 
 
 ---
@@ -77,10 +79,13 @@ go test ./internal/handlers/... -v
 
 ## Usage Examples
 
+All `/v1/*` routes require an `Authorization: Bearer <token>` header (any non-empty token is accepted — this mock doesn't validate real API keys, it just enforces the header shape like the real API does).
+
 ### Chat Completion
 
 ```bash
 curl http://localhost:8080/v1/chat/completions \
+  -H "Authorization: Bearer sk-mock" \
   -H "Content-Type: application/json" \
   -d '{
     "model": "gpt-4o",
@@ -89,10 +94,25 @@ curl http://localhost:8080/v1/chat/completions \
 
 ```
 
+### Chat Completion (streaming)
+
+```bash
+curl -N http://localhost:8080/v1/chat/completions \
+  -H "Authorization: Bearer sk-mock" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "gpt-4o",
+    "messages": [{"role": "user", "content": "Hello!"}],
+    "stream": true
+  }'
+
+```
+
 ### Embeddings (1536 Dimensions)
 
 ```bash
 curl http://localhost:8080/v1/embeddings \
+  -H "Authorization: Bearer sk-mock" \
   -H "Content-Type: application/json" \
   -d '{
     "input": "The food was delicious",

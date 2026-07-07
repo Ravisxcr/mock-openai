@@ -12,7 +12,7 @@ func SetupRouter() *gin.Engine {
 	// Version 1 API Group
 	// API root
 	api := r.Group("/v1")
-	// api.Use(AuthMiddleware())
+	api.Use(AuthMiddleware())
 	{
 		// Chat routes
 		api.POST("/completions", handlers.HandleLegacyCompletions)
@@ -67,6 +67,25 @@ func SetupRouter() *gin.Engine {
 			consents.POST("/:consent_id", handlers.HandleCreateVoiceConsent) // Update is often a POST
 			consents.DELETE("/:consent_id", handlers.HandleDeleteVoiceConsent)
 		}
+	}
+
+	// --- FILES GROUP ---
+	files := api.Group("/files")
+	{
+		files.POST("", handlers.HandleCreateFile)
+		files.GET("", handlers.HandleListFiles)
+		files.GET("/:file_id", handlers.HandleGetFile)
+		files.DELETE("/:file_id", handlers.HandleDeleteFile)
+		files.GET("/:file_id/content", handlers.HandleDownloadFileContent)
+	}
+
+	// --- BATCH GROUP ---
+	batches := api.Group("/batches")
+	{
+		batches.POST("", handlers.HandleCreateBatch)
+		batches.GET("", handlers.HandleListBatches)
+		batches.GET("/:batch_id", handlers.HandleGetBatch)
+		batches.POST("/:batch_id/cancel", handlers.HandleCancelBatch)
 	}
 
 	// Health check for the mock server itself
