@@ -1,2 +1,5 @@
 mock-openai
 *.db
+.env
+openai.yml
+memory.md

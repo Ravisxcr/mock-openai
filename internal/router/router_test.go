@@ -15,7 +15,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestHealthCheckDoesNotRequireAuth(t *testing.T) {
-	r := SetupRouter()
+	r := SetupRouter("")
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/health", nil)
@@ -26,7 +26,7 @@ func TestHealthCheckDoesNotRequireAuth(t *testing.T) {
 }
 
 func TestV1RoutesRequireAuth(t *testing.T) {
-	r := SetupRouter()
+	r := SetupRouter("")
 
 	tests := []struct {
 		name   string
@@ -52,7 +52,7 @@ func TestV1RoutesRequireAuth(t *testing.T) {
 }
 
 func TestAuthMiddlewareMissingHeader(t *testing.T) {
-	r := SetupRouter()
+	r := SetupRouter("")
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodGet, "/v1/models", nil)
@@ -63,7 +63,7 @@ func TestAuthMiddlewareMissingHeader(t *testing.T) {
 }
 
 func TestAuthMiddlewareMalformedHeader(t *testing.T) {
-	r := SetupRouter()
+	r := SetupRouter("")
 
 	cases := []string{
 		"Basic sometoken", // wrong scheme
@@ -84,7 +84,7 @@ func TestAuthMiddlewareMalformedHeader(t *testing.T) {
 }
 
 func TestAuthMiddlewareValidBearerToken(t *testing.T) {
-	r := SetupRouter()
+	r := SetupRouter("")
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodGet, "/v1/models", nil)
@@ -94,8 +94,31 @@ func TestAuthMiddlewareValidBearerToken(t *testing.T) {
 	assert.Equal(t, http.StatusOK, w.Code)
 }
 
+func TestAuthMiddlewareWithConfiguredAPIKeyRejectsMismatch(t *testing.T) {
+	r := SetupRouter("sk-expected-key")
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodGet, "/v1/models", nil)
+	req.Header.Set("Authorization", "Bearer sk-wrong-key")
+	r.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusUnauthorized, w.Code)
+	assert.Contains(t, w.Body.String(), "Incorrect API key provided")
+}
+
+func TestAuthMiddlewareWithConfiguredAPIKeyAcceptsMatch(t *testing.T) {
+	r := SetupRouter("sk-expected-key")
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodGet, "/v1/models", nil)
+	req.Header.Set("Authorization", "Bearer sk-expected-key")
+	r.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+}
+
 func TestNotFoundRoute(t *testing.T) {
-	r := SetupRouter()
+	r := SetupRouter("")
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodGet, "/v1/does-not-exist", nil)

@@ -11,9 +11,11 @@ import (
 )
 
 // AuthMiddleware checks for a Bearer token in the Authorization header.
-// Any non-empty token is accepted — this is a mock server, not a real
-// key validator — but the presence/shape check matches real API behavior.
-func AuthMiddleware() gin.HandlerFunc {
+// If apiKey is non-empty, the token must match it exactly. If apiKey is
+// empty (no API_KEY configured), any non-empty token is accepted — this
+// is the mock's permissive default — but the presence/shape check still
+// matches real API behavior.
+func AuthMiddleware(apiKey string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 
@@ -28,6 +30,12 @@ func AuthMiddleware() gin.HandlerFunc {
 		if len(parts) != 2 || parts[0] != "Bearer" || parts[1] == "" {
 			errs.Respond(c, 401, "invalid_request_error",
 				"Authorization header must be in the format 'Bearer <token>'.", "", "")
+			return
+		}
+
+		if apiKey != "" && parts[1] != apiKey {
+			errs.Respond(c, 401, "invalid_request_error",
+				"Incorrect API key provided.", "", "invalid_api_key")
 			return
 		}
 

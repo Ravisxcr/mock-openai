@@ -6,13 +6,15 @@ import (
 )
 
 // SetupRouter initializes the Gin engine and defines all routes.
-func SetupRouter() *gin.Engine {
+// apiKey is the expected Bearer token for the /v1 group; pass "" to accept
+// any non-empty Bearer token (the mock's default, permissive behavior).
+func SetupRouter(apiKey string) *gin.Engine {
 	r := gin.Default()
 
 	// Version 1 API Group
 	// API root
 	api := r.Group("/v1")
-	api.Use(AuthMiddleware())
+	api.Use(AuthMiddleware(apiKey))
 	{
 		// Chat routes
 		api.POST("/completions", handlers.HandleLegacyCompletions)
