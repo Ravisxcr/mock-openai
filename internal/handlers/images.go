@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"mock-openai/internal/apierror"
+	"mock-openai/internal/errs"
 	"mock-openai/internal/mockdata"
 	"mock-openai/internal/models"
 )
@@ -13,11 +13,11 @@ import (
 func HandleImageGeneration(c *gin.Context) {
 	var req models.ImageRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		apierror.InvalidRequest(c, "Invalid request body: "+err.Error(), "")
+		errs.InvalidRequest(c, "Invalid request body: "+err.Error(), "")
 		return
 	}
 	if req.Prompt == "" {
-		apierror.InvalidRequest(c, "you must provide a prompt parameter", "prompt")
+		errs.InvalidRequest(c, "you must provide a prompt parameter", "prompt")
 		return
 	}
 	model := req.Model
@@ -33,11 +33,11 @@ func HandleImageGeneration(c *gin.Context) {
 func HandleImageEdit(c *gin.Context) {
 	prompt := c.PostForm("prompt")
 	if prompt == "" {
-		apierror.InvalidRequest(c, "you must provide a prompt parameter", "prompt")
+		errs.InvalidRequest(c, "you must provide a prompt parameter", "prompt")
 		return
 	}
 	if _, _, err := c.Request.FormFile("image"); err != nil {
-		apierror.InvalidRequest(c, "you must provide an image file", "image")
+		errs.InvalidRequest(c, "you must provide an image file", "image")
 		return
 	}
 
@@ -48,7 +48,7 @@ func HandleImageEdit(c *gin.Context) {
 // POST /v1/images/variations (multipart/form-data: image, ...)
 func HandleImageVariation(c *gin.Context) {
 	if _, _, err := c.Request.FormFile("image"); err != nil {
-		apierror.InvalidRequest(c, "you must provide an image file", "image")
+		errs.InvalidRequest(c, "you must provide an image file", "image")
 		return
 	}
 

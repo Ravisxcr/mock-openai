@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"mock-openai/internal/apierror"
+	"mock-openai/internal/errs"
 )
 
 type modelInfo struct {
@@ -55,5 +55,5 @@ func HandleModel(c *gin.Context) {
 			return
 		}
 	}
-	apierror.NotFound(c, fmt.Sprintf("The model '%s' does not exist", id), "model_not_found")
+	errs.NotFound(c, fmt.Sprintf("The model '%s' does not exist", id), "model_not_found")
 }

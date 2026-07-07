@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"mock-openai/internal/apierror"
+	"mock-openai/internal/errs"
 	"mock-openai/internal/mockdata"
 	"mock-openai/internal/models"
 	"mock-openai/internal/store"
@@ -15,25 +15,25 @@ import (
 func HandleCreateBatch(c *gin.Context) {
 	var req models.CreateBatchRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		apierror.InvalidRequest(c, "Invalid request body: "+err.Error(), "")
+		errs.InvalidRequest(c, "Invalid request body: "+err.Error(), "")
 		return
 	}
 	if req.InputFileID == "" {
-		apierror.InvalidRequest(c, "you must provide an input_file_id parameter", "input_file_id")
+		errs.InvalidRequest(c, "you must provide an input_file_id parameter", "input_file_id")
 		return
 	}
 	if req.Endpoint == "" {
-		apierror.InvalidRequest(c, "you must provide an endpoint parameter", "endpoint")
+		errs.InvalidRequest(c, "you must provide an endpoint parameter", "endpoint")
 		return
 	}
 	if req.CompletionWindow == "" {
-		apierror.InvalidRequest(c, "you must provide a completion_window parameter", "completion_window")
+		errs.InvalidRequest(c, "you must provide a completion_window parameter", "completion_window")
 		return
 	}
 
 	inputContent, ok := store.GetFileContent(req.InputFileID)
 	if !ok {
-		apierror.InvalidRequest(c, fmt.Sprintf("No such file: '%s'", req.InputFileID), "input_file_id")
+		errs.InvalidRequest(c, fmt.Sprintf("No such file: '%s'", req.InputFileID), "input_file_id")
 		return
 	}
 
@@ -68,7 +68,7 @@ func HandleGetBatch(c *gin.Context) {
 	id := c.Param("batch_id")
 	batch, ok := store.GetBatch(id)
 	if !ok {
-		apierror.NotFound(c, fmt.Sprintf("No such batch: '%s'", id), "batch_not_found")
+		errs.NotFound(c, fmt.Sprintf("No such batch: '%s'", id), "batch_not_found")
 		return
 	}
 	c.JSON(http.StatusOK, batch)
@@ -79,7 +79,7 @@ func HandleCancelBatch(c *gin.Context) {
 	id := c.Param("batch_id")
 	batch, ok := store.GetBatch(id)
 	if !ok {
-		apierror.NotFound(c, fmt.Sprintf("No such batch: '%s'", id), "batch_not_found")
+		errs.NotFound(c, fmt.Sprintf("No such batch: '%s'", id), "batch_not_found")
 		return
 	}
 	// Batches complete synchronously on creation in this mock, so by the time

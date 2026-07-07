@@ -4,7 +4,7 @@ import (
 	"strings"
 	"time"
 
-	"mock-openai/internal/apierror"
+	"mock-openai/internal/errs"
 	"mock-openai/internal/database" // Import your db package
 
 	"github.com/gin-gonic/gin"
@@ -18,7 +18,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		authHeader := c.GetHeader("Authorization")
 
 		if authHeader == "" {
-			apierror.Respond(c, 401, "invalid_request_error",
+			errs.Respond(c, 401, "invalid_request_error",
 				"You didn't provide an API key. You need to provide your API key in an Authorization header using Bearer auth (i.e. Authorization: Bearer YOUR_KEY).",
 				"", "")
 			return
@@ -26,7 +26,7 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		parts := strings.SplitN(authHeader, " ", 2)
 		if len(parts) != 2 || parts[0] != "Bearer" || parts[1] == "" {
-			apierror.Respond(c, 401, "invalid_request_error",
+			errs.Respond(c, 401, "invalid_request_error",
 				"Authorization header must be in the format 'Bearer <token>'.", "", "")
 			return
 		}

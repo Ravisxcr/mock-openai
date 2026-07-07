@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"mock-openai/internal/apierror"
+	"mock-openai/internal/errs"
 	"mock-openai/internal/mockdata"
 	"mock-openai/internal/store"
 )
@@ -25,28 +25,28 @@ var validFilePurposes = map[string]bool{
 func HandleCreateFile(c *gin.Context) {
 	fileHeader, err := c.FormFile("file")
 	if err != nil {
-		apierror.InvalidRequest(c, "you must provide a file parameter", "file")
+		errs.InvalidRequest(c, "you must provide a file parameter", "file")
 		return
 	}
 	purpose := c.PostForm("purpose")
 	if purpose == "" {
-		apierror.InvalidRequest(c, "you must provide a purpose parameter", "purpose")
+		errs.InvalidRequest(c, "you must provide a purpose parameter", "purpose")
 		return
 	}
 	if !validFilePurposes[purpose] {
-		apierror.InvalidRequest(c, fmt.Sprintf("'%s' is not a valid purpose", purpose), "purpose")
+		errs.InvalidRequest(c, fmt.Sprintf("'%s' is not a valid purpose", purpose), "purpose")
 		return
 	}
 
 	f, err := fileHeader.Open()
 	if err != nil {
-		apierror.Respond(c, http.StatusInternalServerError, "server_error", "Failed to read uploaded file", "", "")
+		errs.Respond(c, http.StatusInternalServerError, "server_error", "Failed to read uploaded file", "", "")
 		return
 	}
 	defer f.Close()
 	content, err := io.ReadAll(f)
 	if err != nil {
-		apierror.Respond(c, http.StatusInternalServerError, "server_error", "Failed to read uploaded file", "", "")
+		errs.Respond(c, http.StatusInternalServerError, "server_error", "Failed to read uploaded file", "", "")
 		return
 	}
 
@@ -77,7 +77,7 @@ func HandleGetFile(c *gin.Context) {
 	id := c.Param("file_id")
 	obj, ok := store.GetFile(id)
 	if !ok {
-		apierror.NotFound(c, fmt.Sprintf("No such file: '%s'", id), "file_not_found")
+		errs.NotFound(c, fmt.Sprintf("No such file: '%s'", id), "file_not_found")
 		return
 	}
 	c.JSON(http.StatusOK, obj)
@@ -87,7 +87,7 @@ func HandleGetFile(c *gin.Context) {
 func HandleDeleteFile(c *gin.Context) {
 	id := c.Param("file_id")
 	if !store.DeleteFile(id) {
-		apierror.NotFound(c, fmt.Sprintf("No such file: '%s'", id), "file_not_found")
+		errs.NotFound(c, fmt.Sprintf("No such file: '%s'", id), "file_not_found")
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -102,7 +102,7 @@ func HandleDownloadFileContent(c *gin.Context) {
 	id := c.Param("file_id")
 	obj, ok := store.GetFile(id)
 	if !ok {
-		apierror.NotFound(c, fmt.Sprintf("No such file: '%s'", id), "file_not_found")
+		errs.NotFound(c, fmt.Sprintf("No such file: '%s'", id), "file_not_found")
 		return
 	}
 	content, _ := store.GetFileContent(id)

@@ -1,6 +1,6 @@
-// Package apierror provides the OpenAI-compatible error envelope
+// Package errs provides the OpenAI-compatible error envelope
 // (see openai.yml components.schemas.Error / ErrorResponse).
-package apierror
+package errs
 
 import "github.com/gin-gonic/gin"
 

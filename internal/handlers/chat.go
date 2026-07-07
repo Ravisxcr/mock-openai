@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"mock-openai/internal/apierror"
+	"mock-openai/internal/errs"
 	"mock-openai/internal/mockdata"
 	"mock-openai/internal/models"
 	"mock-openai/internal/store"
@@ -17,25 +17,25 @@ import (
 func HandleChatCompletions(c *gin.Context) {
 	var req models.ChatRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		apierror.InvalidRequest(c, "Invalid request body: "+err.Error(), "")
+		errs.InvalidRequest(c, "Invalid request body: "+err.Error(), "")
 		return
 	}
 	if req.Model == "" {
-		apierror.InvalidRequest(c, "you must provide a model parameter", "model")
+		errs.InvalidRequest(c, "you must provide a model parameter", "model")
 		return
 	}
 	if len(req.Messages) == 0 {
-		apierror.InvalidRequest(c, "'messages' must contain at least one item", "messages")
+		errs.InvalidRequest(c, "'messages' must contain at least one item", "messages")
 		return
 	}
 	if len(req.ToolChoice) > 0 || len(req.Tools) > 0 {
 		mode, functionName, err := mockdata.ParseToolChoice(req.ToolChoice, len(req.Tools) > 0)
 		if err != nil {
-			apierror.InvalidRequest(c, "Invalid value for 'tool_choice': "+err.Error(), "tool_choice")
+			errs.InvalidRequest(c, "Invalid value for 'tool_choice': "+err.Error(), "tool_choice")
 			return
 		}
 		if len(req.ToolChoice) > 0 && len(req.Tools) == 0 && mode != "none" {
-			apierror.InvalidRequest(c, "'tool_choice' is only allowed when 'tools' are specified.", "tool_choice")
+			errs.InvalidRequest(c, "'tool_choice' is only allowed when 'tools' are specified.", "tool_choice")
 			return
 		}
 		if mode == "function" {
@@ -47,7 +47,7 @@ func HandleChatCompletions(c *gin.Context) {
 				}
 			}
 			if !found {
-				apierror.InvalidRequest(c, fmt.Sprintf("Invalid value for 'tool_choice': function '%s' does not exist. Please check your 'tools' array.", functionName), "tool_choice")
+				errs.InvalidRequest(c, fmt.Sprintf("Invalid value for 'tool_choice': function '%s' does not exist. Please check your 'tools' array.", functionName), "tool_choice")
 				return
 			}
 		}
@@ -113,7 +113,7 @@ func HandleChatCompletion(c *gin.Context) {
 	id := c.Param("completion_id")
 	resp, ok := store.GetCompletion(id)
 	if !ok {
-		apierror.NotFound(c, fmt.Sprintf("No chat completion found with id '%s'.", id), "completion_not_found")
+		errs.NotFound(c, fmt.Sprintf("No chat completion found with id '%s'.", id), "completion_not_found")
 		return
 	}
 	c.JSON(http.StatusOK, resp)
@@ -124,7 +124,7 @@ func HandleUpdateChatCompletion(c *gin.Context) {
 	id := c.Param("completion_id")
 	resp, ok := store.GetCompletion(id)
 	if !ok {
-		apierror.NotFound(c, fmt.Sprintf("No chat completion found with id '%s'.", id), "completion_not_found")
+		errs.NotFound(c, fmt.Sprintf("No chat completion found with id '%s'.", id), "completion_not_found")
 		return
 	}
 
@@ -132,7 +132,7 @@ func HandleUpdateChatCompletion(c *gin.Context) {
 		Metadata map[string]string `json:"metadata"`
 	}
 	if err := c.ShouldBindJSON(&body); err != nil {
-		apierror.InvalidRequest(c, "Invalid request body: "+err.Error(), "")
+		errs.InvalidRequest(c, "Invalid request body: "+err.Error(), "")
 		return
 	}
 	resp.Metadata = body.Metadata
@@ -144,7 +144,7 @@ func HandleUpdateChatCompletion(c *gin.Context) {
 func HandleDeleteChatCompletion(c *gin.Context) {
 	id := c.Param("completion_id")
 	if !store.DeleteCompletion(id) {
-		apierror.NotFound(c, fmt.Sprintf("No chat completion found with id '%s'.", id), "completion_not_found")
+		errs.NotFound(c, fmt.Sprintf("No chat completion found with id '%s'.", id), "completion_not_found")
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -159,7 +159,7 @@ func HandleGetChatMessages(c *gin.Context) {
 	id := c.Param("completion_id")
 	resp, ok := store.GetCompletion(id)
 	if !ok {
-		apierror.NotFound(c, fmt.Sprintf("No chat completion found with id '%s'.", id), "completion_not_found")
+		errs.NotFound(c, fmt.Sprintf("No chat completion found with id '%s'.", id), "completion_not_found")
 		return
 	}
 
