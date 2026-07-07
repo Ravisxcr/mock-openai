@@ -13,7 +13,19 @@ import (
 	"mock-openai/internal/store"
 )
 
-// POST /v1/chat/completions
+// HandleChatCompletions creates a model response for the given chat conversation.
+//
+// @Summary		Create chat completion
+// @Description	Creates a model response for the given chat conversation. Supports streaming (SSE), tool/function calling, and multimodal content parts.
+// @Tags			Chat
+// @Accept			json
+// @Produce		json
+// @Param			request	body		models.ChatRequest	true	"Chat completion request"
+// @Success		200		{object}	models.ChatResponse
+// @Failure		400		{object}	errs.Response
+// @Failure		401		{object}	errs.Response
+// @Security		BearerAuth
+// @Router			/chat/completions [post]
 func HandleChatCompletions(c *gin.Context) {
 	var req models.ChatRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -88,7 +100,16 @@ func streamChatCompletion(c *gin.Context, resp models.ChatResponse, req models.C
 	}
 }
 
-// GET /v1/chat/completions
+// HandleListChatCompletions lists stored chat completions.
+//
+// @Summary		List chat completions
+// @Description	Lists chat completions previously created and stored by this mock server.
+// @Tags			Chat
+// @Produce		json
+// @Success		200	{object}	map[string]interface{}
+// @Failure		401	{object}	errs.Response
+// @Security		BearerAuth
+// @Router			/chat/completions [get]
 func HandleListChatCompletions(c *gin.Context) {
 	completions := store.ListCompletions()
 	ids := make([]string, len(completions))
@@ -108,7 +129,17 @@ func HandleListChatCompletions(c *gin.Context) {
 	})
 }
 
-// GET /v1/chat/completions/:completion_id
+// HandleChatCompletion retrieves a stored chat completion by id.
+//
+// @Summary		Get chat completion
+// @Description	Retrieves a stored chat completion by id.
+// @Tags			Chat
+// @Produce		json
+// @Param			completion_id	path		string	true	"Chat completion ID"
+// @Success		200				{object}	models.ChatResponse
+// @Failure		404				{object}	errs.Response
+// @Security		BearerAuth
+// @Router			/chat/completions/{completion_id} [get]
 func HandleChatCompletion(c *gin.Context) {
 	id := c.Param("completion_id")
 	resp, ok := store.GetCompletion(id)
@@ -119,7 +150,20 @@ func HandleChatCompletion(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
-// POST /v1/chat/completions/:completion_id (metadata-only update, per spec)
+// HandleUpdateChatCompletion updates the metadata of a stored chat completion.
+//
+// @Summary		Update chat completion
+// @Description	Modifies metadata on a stored chat completion. Only the `metadata` field can be updated, per the real API.
+// @Tags			Chat
+// @Accept			json
+// @Produce		json
+// @Param			completion_id	path		string					true	"Chat completion ID"
+// @Param			request			body		object{metadata=map[string]string}	true	"Metadata update"
+// @Success		200				{object}	models.ChatResponse
+// @Failure		400				{object}	errs.Response
+// @Failure		404				{object}	errs.Response
+// @Security		BearerAuth
+// @Router			/chat/completions/{completion_id} [post]
 func HandleUpdateChatCompletion(c *gin.Context) {
 	id := c.Param("completion_id")
 	resp, ok := store.GetCompletion(id)
@@ -140,7 +184,17 @@ func HandleUpdateChatCompletion(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
-// DELETE /v1/chat/completions/:completion_id
+// HandleDeleteChatCompletion deletes a stored chat completion.
+//
+// @Summary		Delete chat completion
+// @Description	Deletes a stored chat completion by id.
+// @Tags			Chat
+// @Produce		json
+// @Param			completion_id	path		string	true	"Chat completion ID"
+// @Success		200				{object}	object{id=string,object=string,deleted=bool}
+// @Failure		404				{object}	errs.Response
+// @Security		BearerAuth
+// @Router			/chat/completions/{completion_id} [delete]
 func HandleDeleteChatCompletion(c *gin.Context) {
 	id := c.Param("completion_id")
 	if !store.DeleteCompletion(id) {
@@ -154,7 +208,17 @@ func HandleDeleteChatCompletion(c *gin.Context) {
 	})
 }
 
-// GET /v1/chat/completions/:completion_id/messages
+// HandleGetChatMessages lists the messages of a stored chat completion.
+//
+// @Summary		List chat completion messages
+// @Description	Lists the request messages plus the generated assistant reply for a stored chat completion.
+// @Tags			Chat
+// @Produce		json
+// @Param			completion_id	path		string	true	"Chat completion ID"
+// @Success		200				{object}	map[string]interface{}
+// @Failure		404				{object}	errs.Response
+// @Security		BearerAuth
+// @Router			/chat/completions/{completion_id}/messages [get]
 func HandleGetChatMessages(c *gin.Context) {
 	id := c.Param("completion_id")
 	resp, ok := store.GetCompletion(id)
@@ -178,7 +242,16 @@ func HandleGetChatMessages(c *gin.Context) {
 	})
 }
 
-// POST /v1/completions (legacy)
+// HandleLegacyCompletions creates a legacy (non-chat) text completion.
+//
+// @Summary		Create legacy completion
+// @Description	Creates a completion for the deprecated /v1/completions endpoint. Always returns a fixed mock response for model "gpt-3.5-turbo-instruct".
+// @Tags			Completions
+// @Produce		json
+// @Success		200	{object}	map[string]interface{}
+// @Failure		401	{object}	errs.Response
+// @Security		BearerAuth
+// @Router			/completions [post]
 func HandleLegacyCompletions(c *gin.Context) {
 	c.JSON(http.StatusOK, mockdata.GenerateLegacyCompletion("gpt-3.5-turbo-instruct"))
 }

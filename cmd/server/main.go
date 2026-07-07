@@ -8,6 +8,23 @@ import (
 	"mock-openai/internal/router"   // Update this path
 )
 
+// @title						Mock OpenAI API
+// @version					1.0
+// @description				A lightweight local mock of the OpenAI REST API, covering Chat Completions
+// @description				(including streaming, tool calls, and multimodal content), Embeddings, Images,
+// @description				Audio, Models, Files, and Batch. Response shapes track the official OpenAI
+// @description				OpenAPI spec vendored at openai.yml; see memory.md for known deviations.
+// @termsOfService				http://swagger.io/terms/
+//
+// @license.name				MIT
+//
+// @host						localhost:8080
+// @BasePath					/v1
+//
+// @securityDefinitions.apikey	BearerAuth
+// @in							header
+// @name						Authorization
+// @description				Bearer token auth. Any non-empty token is accepted unless API_KEY is configured (see README). Example: "Bearer sk-mock".
 func main() {
 	if err := config.LoadDotEnv(".env"); err != nil {
 		log.Printf("Warning: failed to load .env file: %v", err)

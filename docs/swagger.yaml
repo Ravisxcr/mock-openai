@@ -1,0 +1,1380 @@
+basePath: /v1
+definitions:
+  errs.Detail:
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+      param:
+        type: string
+      type:
+        type: string
+    type: object
+  errs.Response:
+    properties:
+      error:
+        $ref: '#/definitions/errs.Detail'
+    type: object
+  handlers.modelInfo:
+    properties:
+      created:
+        type: integer
+      id:
+        type: string
+      object:
+        type: string
+      owned_by:
+        type: string
+    type: object
+  models.AudioResponse:
+    properties:
+      text:
+        type: string
+    type: object
+  models.AudioSpeechRequest:
+    properties:
+      input:
+        type: string
+      model:
+        type: string
+      response_format:
+        type: string
+      speed:
+        type: number
+      voice:
+        type: string
+    type: object
+  models.Batch:
+    properties:
+      cancelled_at:
+        type: integer
+      cancelling_at:
+        type: integer
+      completed_at:
+        type: integer
+      completion_window:
+        type: string
+      created_at:
+        type: integer
+      endpoint:
+        type: string
+      error_file_id:
+        type: string
+      errors: {}
+      expired_at:
+        type: integer
+      expires_at:
+        type: integer
+      failed_at:
+        type: integer
+      finalizing_at:
+        type: integer
+      id:
+        type: string
+      in_progress_at:
+        type: integer
+      input_file_id:
+        type: string
+      metadata:
+        additionalProperties:
+          type: string
+        type: object
+      object:
+        description: always "batch"
+        type: string
+      output_file_id:
+        type: string
+      request_counts:
+        $ref: '#/definitions/models.BatchRequestCounts'
+      status:
+        type: string
+    type: object
+  models.BatchRequestCounts:
+    properties:
+      completed:
+        type: integer
+      failed:
+        type: integer
+      total:
+        type: integer
+    type: object
+  models.ChatChoice:
+    properties:
+      finish_reason:
+        type: string
+      index:
+        type: integer
+      logprobs: {}
+      message:
+        $ref: '#/definitions/models.ChatResponseMessage'
+    type: object
+  models.ChatContentPart:
+    properties:
+      file:
+        $ref: '#/definitions/models.ChatFilePart'
+      image_url:
+        $ref: '#/definitions/models.ChatImageURL'
+      input_audio:
+        $ref: '#/definitions/models.ChatInputAudio'
+      refusal:
+        type: string
+      text:
+        type: string
+      type:
+        type: string
+    type: object
+  models.ChatFilePart:
+    properties:
+      file_data:
+        type: string
+      file_id:
+        type: string
+      filename:
+        type: string
+    type: object
+  models.ChatImageURL:
+    properties:
+      detail:
+        type: string
+      url:
+        type: string
+    type: object
+  models.ChatInputAudio:
+    properties:
+      data:
+        type: string
+      format:
+        type: string
+    type: object
+  models.ChatMessage:
+    properties:
+      content:
+        $ref: '#/definitions/models.ChatMessageContent'
+      name:
+        type: string
+      role:
+        type: string
+      tool_call_id:
+        description: 'tool-role messages: which call this responds to'
+        type: string
+      tool_calls:
+        description: assistant messages replaying tool-call history
+        items:
+          $ref: '#/definitions/models.ToolCall'
+        type: array
+    type: object
+  models.ChatMessageContent:
+    properties:
+      parts:
+        items:
+          $ref: '#/definitions/models.ChatContentPart'
+        type: array
+      text:
+        type: string
+    type: object
+  models.ChatRequest:
+    properties:
+      frequency_penalty:
+        type: number
+      logprobs:
+        type: boolean
+      max_completion_tokens:
+        type: integer
+      max_tokens:
+        description: deprecated, kept for compatibility
+        type: integer
+      messages:
+        items:
+          $ref: '#/definitions/models.ChatMessage'
+        type: array
+      model:
+        type: string
+      "n":
+        type: integer
+      parallel_tool_calls:
+        type: boolean
+      presence_penalty:
+        type: number
+      seed:
+        type: integer
+      stop: {}
+      stream:
+        type: boolean
+      stream_options:
+        $ref: '#/definitions/models.ChatStreamOptions'
+      temperature:
+        type: number
+      tool_choice:
+        description: oneOf "none"|"auto"|"required"|{type,function}; documented as
+          object, see openai.yml for the full union
+        type: object
+      tools:
+        items:
+          $ref: '#/definitions/models.ChatTool'
+        type: array
+      top_logprobs:
+        type: integer
+      top_p:
+        type: number
+      user:
+        type: string
+    type: object
+  models.ChatResponse:
+    properties:
+      choices:
+        items:
+          $ref: '#/definitions/models.ChatChoice'
+        type: array
+      created:
+        type: integer
+      id:
+        type: string
+      metadata:
+        additionalProperties:
+          type: string
+        type: object
+      model:
+        type: string
+      object:
+        type: string
+      service_tier:
+        type: string
+      system_fingerprint:
+        type: string
+      usage:
+        $ref: '#/definitions/models.UsageStats'
+    type: object
+  models.ChatResponseMessage:
+    properties:
+      annotations:
+        items: {}
+        type: array
+      content:
+        type: string
+      refusal:
+        type: string
+      role:
+        type: string
+      tool_calls:
+        items:
+          $ref: '#/definitions/models.ToolCall'
+        type: array
+    type: object
+  models.ChatStreamOptions:
+    properties:
+      include_usage:
+        type: boolean
+    type: object
+  models.ChatTool:
+    properties:
+      function:
+        $ref: '#/definitions/models.ChatToolFunction'
+      type:
+        type: string
+    type: object
+  models.ChatToolFunction:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+      parameters:
+        additionalProperties: true
+        type: object
+      strict:
+        type: boolean
+    type: object
+  models.CompletionTokensDetails:
+    properties:
+      accepted_prediction_tokens:
+        type: integer
+      audio_tokens:
+        type: integer
+      reasoning_tokens:
+        type: integer
+      rejected_prediction_tokens:
+        type: integer
+    type: object
+  models.CreateBatchRequest:
+    properties:
+      completion_window:
+        type: string
+      endpoint:
+        type: string
+      input_file_id:
+        type: string
+      metadata:
+        additionalProperties:
+          type: string
+        type: object
+    type: object
+  models.DeleteFileResponse:
+    properties:
+      deleted:
+        type: boolean
+      id:
+        type: string
+      object:
+        description: always "file"
+        type: string
+    type: object
+  models.EmbeddingData:
+    properties:
+      embedding: {}
+      index:
+        type: integer
+      object:
+        type: string
+    type: object
+  models.EmbeddingRequest:
+    properties:
+      dimensions:
+        type: integer
+      encoding_format:
+        description: '"float" (default) or "base64"'
+        type: string
+      input: {}
+      model:
+        type: string
+      user:
+        type: string
+    type: object
+  models.EmbeddingResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/models.EmbeddingData'
+        type: array
+      model:
+        type: string
+      object:
+        type: string
+      usage:
+        $ref: '#/definitions/models.EmbeddingUsage'
+    type: object
+  models.EmbeddingUsage:
+    properties:
+      prompt_tokens:
+        type: integer
+      total_tokens:
+        type: integer
+    type: object
+  models.FileObject:
+    properties:
+      bytes:
+        type: integer
+      created_at:
+        type: integer
+      expires_at:
+        type: integer
+      filename:
+        type: string
+      id:
+        type: string
+      object:
+        description: always "file"
+        type: string
+      purpose:
+        type: string
+      status:
+        description: deprecated in the real API, but required; always "processed"
+          here
+        type: string
+    type: object
+  models.ImageData:
+    properties:
+      b64_json:
+        type: string
+      revised_prompt:
+        type: string
+      url:
+        type: string
+    type: object
+  models.ImageRequest:
+    properties:
+      model:
+        type: string
+      "n":
+        type: integer
+      prompt:
+        type: string
+      quality:
+        type: string
+      response_format:
+        type: string
+      size:
+        type: string
+      style:
+        type: string
+      user:
+        type: string
+    type: object
+  models.ImageResponse:
+    properties:
+      created:
+        type: integer
+      data:
+        items:
+          $ref: '#/definitions/models.ImageData'
+        type: array
+    type: object
+  models.ListBatchesResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/models.Batch'
+        type: array
+      first_id:
+        type: string
+      has_more:
+        type: boolean
+      last_id:
+        type: string
+      object:
+        type: string
+    type: object
+  models.ListFilesResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/models.FileObject'
+        type: array
+      first_id:
+        type: string
+      has_more:
+        type: boolean
+      last_id:
+        type: string
+      object:
+        type: string
+    type: object
+  models.PromptTokensDetails:
+    properties:
+      audio_tokens:
+        type: integer
+      cached_tokens:
+        type: integer
+    type: object
+  models.ToolCall:
+    properties:
+      function:
+        $ref: '#/definitions/models.ToolCallFunction'
+      id:
+        type: string
+      index:
+        type: integer
+      type:
+        type: string
+    type: object
+  models.ToolCallFunction:
+    properties:
+      arguments:
+        type: string
+      name:
+        type: string
+    type: object
+  models.UsageStats:
+    properties:
+      completion_tokens:
+        type: integer
+      completion_tokens_details:
+        $ref: '#/definitions/models.CompletionTokensDetails'
+      prompt_tokens:
+        type: integer
+      prompt_tokens_details:
+        $ref: '#/definitions/models.PromptTokensDetails'
+      total_tokens:
+        type: integer
+    type: object
+  models.VoiceConsent:
+    properties:
+      created_at:
+        type: integer
+      id:
+        type: string
+      object:
+        type: string
+      status:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: |-
+    A lightweight local mock of the OpenAI REST API, covering Chat Completions
+    (including streaming, tool calls, and multimodal content), Embeddings, Images,
+    Audio, Models, Files, and Batch. Response shapes track the official OpenAI
+    OpenAPI spec vendored at openai.yml; see memory.md for known deviations.
+  license:
+    name: MIT
+  termsOfService: http://swagger.io/terms/
+  title: Mock OpenAI API
+  version: "1.0"
+paths:
+  /audio/speech:
+    post:
+      consumes:
+      - application/json
+      description: Generates audio from the input text. Returns a fixed mock audio
+        payload with a content-type matching the requested response_format.
+      parameters:
+      - description: Speech request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.AudioSpeechRequest'
+      produces:
+      - audio/mpeg
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errs.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errs.Response'
+      security:
+      - BearerAuth: []
+      summary: Create speech
+      tags:
+      - Audio
+  /audio/transcriptions:
+    post:
+      consumes:
+      - multipart/form-data
+      description: 'Transcribes audio into the input language. response_format controls
+        the reply shape: json (default), text, srt, vtt, or verbose_json.'
+      parameters:
+      - description: Audio file to transcribe
+        in: formData
+        name: file
+        required: true
+        type: file
+      - description: Model ID (e.g. whisper-1)
+        in: formData
+        name: model
+        required: true
+        type: string
+      - description: json, text, srt, vtt, or verbose_json
+        in: formData
+        name: response_format
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.AudioResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errs.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errs.Response'
+      security:
+      - BearerAuth: []
+      summary: Create transcription
+      tags:
+      - Audio
+  /audio/translations:
+    post:
+      consumes:
+      - multipart/form-data
+      description: 'Translates audio into English. response_format controls the reply
+        shape: json (default), text, srt, vtt, or verbose_json.'
+      parameters:
+      - description: Audio file to translate
+        in: formData
+        name: file
+        required: true
+        type: file
+      - description: Model ID (e.g. whisper-1)
+        in: formData
+        name: model
+        required: true
+        type: string
+      - description: json, text, srt, vtt, or verbose_json
+        in: formData
+        name: response_format
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.AudioResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errs.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errs.Response'
+      security:
+      - BearerAuth: []
+      summary: Create translation
+      tags:
+      - Audio
+  /audio/voice_consents:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                items:
+                  $ref: '#/definitions/models.VoiceConsent'
+                type: array
+              object:
+                type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errs.Response'
+      security:
+      - BearerAuth: []
+      summary: List voice consents
+      tags:
+      - Audio
+    post:
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.VoiceConsent'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errs.Response'
+      security:
+      - BearerAuth: []
+      summary: Create voice consent
+      tags:
+      - Audio
+  /audio/voice_consents/{consent_id}:
+    delete:
+      parameters:
+      - description: Voice consent ID
+        in: path
+        name: consent_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              deleted:
+                type: boolean
+              id:
+                type: string
+              object:
+                type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errs.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete voice consent
+      tags:
+      - Audio
+    get:
+      parameters:
+      - description: Voice consent ID
+        in: path
+        name: consent_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.VoiceConsent'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errs.Response'
+      security:
+      - BearerAuth: []
+      summary: Get voice consent
+      tags:
+      - Audio
+    post:
+      parameters:
+      - description: Voice consent ID (update variant only)
+        in: path
+        name: consent_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.VoiceConsent'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errs.Response'
+      security:
+      - BearerAuth: []
+      summary: Create voice consent
+      tags:
+      - Audio
+  /batches:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ListBatchesResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errs.Response'
+      security:
+      - BearerAuth: []
+      summary: List batches
+      tags:
+      - Batch
+    post:
+      consumes:
+      - application/json
+      description: Creates and runs a batch job against a previously uploaded input
+        file. Unlike the real API, batches in this mock complete synchronously and
+        are ready by the time the create call returns.
+      parameters:
+      - description: Batch creation request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateBatchRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Batch'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errs.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errs.Response'
+      security:
+      - BearerAuth: []
+      summary: Create batch
+      tags:
+      - Batch
+  /batches/{batch_id}:
+    get:
+      parameters:
+      - description: Batch ID
+        in: path
+        name: batch_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Batch'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errs.Response'
+      security:
+      - BearerAuth: []
+      summary: Get batch
+      tags:
+      - Batch
+  /batches/{batch_id}/cancel:
+    post:
+      description: Cancels an in-progress batch. In this mock, batches already complete
+        synchronously on creation, so the batch is returned unchanged.
+      parameters:
+      - description: Batch ID
+        in: path
+        name: batch_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Batch'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errs.Response'
+      security:
+      - BearerAuth: []
+      summary: Cancel batch
+      tags:
+      - Batch
+  /chat/completions:
+    get:
+      description: Lists chat completions previously created and stored by this mock
+        server.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errs.Response'
+      security:
+      - BearerAuth: []
+      summary: List chat completions
+      tags:
+      - Chat
+    post:
+      consumes:
+      - application/json
+      description: Creates a model response for the given chat conversation. Supports
+        streaming (SSE), tool/function calling, and multimodal content parts.
+      parameters:
+      - description: Chat completion request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.ChatRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ChatResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errs.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errs.Response'
+      security:
+      - BearerAuth: []
+      summary: Create chat completion
+      tags:
+      - Chat
+  /chat/completions/{completion_id}:
+    delete:
+      description: Deletes a stored chat completion by id.
+      parameters:
+      - description: Chat completion ID
+        in: path
+        name: completion_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              deleted:
+                type: boolean
+              id:
+                type: string
+              object:
+                type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errs.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete chat completion
+      tags:
+      - Chat
+    get:
+      description: Retrieves a stored chat completion by id.
+      parameters:
+      - description: Chat completion ID
+        in: path
+        name: completion_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ChatResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errs.Response'
+      security:
+      - BearerAuth: []
+      summary: Get chat completion
+      tags:
+      - Chat
+    post:
+      consumes:
+      - application/json
+      description: Modifies metadata on a stored chat completion. Only the `metadata`
+        field can be updated, per the real API.
+      parameters:
+      - description: Chat completion ID
+        in: path
+        name: completion_id
+        required: true
+        type: string
+      - description: Metadata update
+        in: body
+        name: request
+        required: true
+        schema:
+          properties:
+            metadata:
+              additionalProperties:
+                type: string
+              type: object
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ChatResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errs.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errs.Response'
+      security:
+      - BearerAuth: []
+      summary: Update chat completion
+      tags:
+      - Chat
+  /chat/completions/{completion_id}/messages:
+    get:
+      description: Lists the request messages plus the generated assistant reply for
+        a stored chat completion.
+      parameters:
+      - description: Chat completion ID
+        in: path
+        name: completion_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errs.Response'
+      security:
+      - BearerAuth: []
+      summary: List chat completion messages
+      tags:
+      - Chat
+  /completions:
+    post:
+      description: Creates a completion for the deprecated /v1/completions endpoint.
+        Always returns a fixed mock response for model "gpt-3.5-turbo-instruct".
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errs.Response'
+      security:
+      - BearerAuth: []
+      summary: Create legacy completion
+      tags:
+      - Completions
+  /embeddings:
+    post:
+      consumes:
+      - application/json
+      description: Creates an embedding vector representing the input text.
+      parameters:
+      - description: Embedding request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.EmbeddingRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.EmbeddingResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errs.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errs.Response'
+      security:
+      - BearerAuth: []
+      summary: Create embeddings
+      tags:
+      - Embeddings
+  /files:
+    get:
+      description: Returns a list of files, optionally filtered by purpose.
+      parameters:
+      - description: Only return files with this purpose
+        in: query
+        name: purpose
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ListFilesResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errs.Response'
+      security:
+      - BearerAuth: []
+      summary: List files
+      tags:
+      - Files
+    post:
+      consumes:
+      - multipart/form-data
+      description: Uploads a file that can be used across various endpoints (assistants,
+        batch, fine-tune, vision, user_data, evals).
+      parameters:
+      - description: File to upload
+        in: formData
+        name: file
+        required: true
+        type: file
+      - description: assistants, batch, fine-tune, vision, user_data, or evals
+        in: formData
+        name: purpose
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.FileObject'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errs.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errs.Response'
+      security:
+      - BearerAuth: []
+      summary: Upload file
+      tags:
+      - Files
+  /files/{file_id}:
+    delete:
+      parameters:
+      - description: File ID
+        in: path
+        name: file_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.DeleteFileResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errs.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete file
+      tags:
+      - Files
+    get:
+      description: Returns information about a specific file.
+      parameters:
+      - description: File ID
+        in: path
+        name: file_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.FileObject'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errs.Response'
+      security:
+      - BearerAuth: []
+      summary: Get file
+      tags:
+      - Files
+  /files/{file_id}/content:
+    get:
+      parameters:
+      - description: File ID
+        in: path
+        name: file_id
+        required: true
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errs.Response'
+      security:
+      - BearerAuth: []
+      summary: Download file content
+      tags:
+      - Files
+  /images/edits:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Creates an edited or extended image given an original image and
+        a prompt.
+      parameters:
+      - description: Image to edit
+        in: formData
+        name: image
+        required: true
+        type: file
+      - description: Description of the desired edit
+        in: formData
+        name: prompt
+        required: true
+        type: string
+      - description: url or b64_json
+        in: formData
+        name: response_format
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ImageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errs.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errs.Response'
+      security:
+      - BearerAuth: []
+      summary: Create image edit
+      tags:
+      - Images
+  /images/generations:
+    post:
+      consumes:
+      - application/json
+      description: Creates an image given a text prompt.
+      parameters:
+      - description: Image generation request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.ImageRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ImageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errs.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errs.Response'
+      security:
+      - BearerAuth: []
+      summary: Create image
+      tags:
+      - Images
+  /images/variations:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Creates a variation of a given image.
+      parameters:
+      - description: Image to use as the basis for the variation
+        in: formData
+        name: image
+        required: true
+        type: file
+      - description: url or b64_json
+        in: formData
+        name: response_format
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ImageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errs.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errs.Response'
+      security:
+      - BearerAuth: []
+      summary: Create image variation
+      tags:
+      - Images
+  /models:
+    get:
+      description: 'Lists the model ids this mock recognizes. Note: chat/embeddings/images/audio
+        endpoints accept any model string, not just these.'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                items:
+                  $ref: '#/definitions/handlers.modelInfo'
+                type: array
+              object:
+                type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errs.Response'
+      security:
+      - BearerAuth: []
+      summary: List models
+      tags:
+      - Models
+  /models/{model_id}:
+    get:
+      description: Retrieves a single model by id, if it's one of the ids returned
+        by List models.
+      parameters:
+      - description: Model ID
+        in: path
+        name: model_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.modelInfo'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errs.Response'
+      security:
+      - BearerAuth: []
+      summary: Get model
+      tags:
+      - Models
+securityDefinitions:
+  BearerAuth:
+    description: 'Bearer token auth. Any non-empty token is accepted unless API_KEY
+      is configured (see README). Example: "Bearer sk-mock".'
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

@@ -11,7 +11,19 @@ import (
 	"mock-openai/internal/store"
 )
 
-// POST /v1/batches
+// HandleCreateBatch creates and runs a batch from an uploaded file of requests.
+//
+// @Summary		Create batch
+// @Description	Creates and runs a batch job against a previously uploaded input file. Unlike the real API, batches in this mock complete synchronously and are ready by the time the create call returns.
+// @Tags			Batch
+// @Accept			json
+// @Produce		json
+// @Param			request	body		models.CreateBatchRequest	true	"Batch creation request"
+// @Success		200		{object}	models.Batch
+// @Failure		400		{object}	errs.Response
+// @Failure		401		{object}	errs.Response
+// @Security		BearerAuth
+// @Router			/batches [post]
 func HandleCreateBatch(c *gin.Context) {
 	var req models.CreateBatchRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -47,7 +59,15 @@ func HandleCreateBatch(c *gin.Context) {
 	c.JSON(http.StatusOK, batch)
 }
 
-// GET /v1/batches
+// HandleListBatches lists batches.
+//
+// @Summary		List batches
+// @Tags			Batch
+// @Produce		json
+// @Success		200	{object}	models.ListBatchesResponse
+// @Failure		401	{object}	errs.Response
+// @Security		BearerAuth
+// @Router			/batches [get]
 func HandleListBatches(c *gin.Context) {
 	batches := store.ListBatches()
 	firstID, lastID := "", ""
@@ -63,7 +83,16 @@ func HandleListBatches(c *gin.Context) {
 	})
 }
 
-// GET /v1/batches/:batch_id
+// HandleGetBatch retrieves a batch by id.
+//
+// @Summary		Get batch
+// @Tags			Batch
+// @Produce		json
+// @Param			batch_id	path		string	true	"Batch ID"
+// @Success		200			{object}	models.Batch
+// @Failure		404			{object}	errs.Response
+// @Security		BearerAuth
+// @Router			/batches/{batch_id} [get]
 func HandleGetBatch(c *gin.Context) {
 	id := c.Param("batch_id")
 	batch, ok := store.GetBatch(id)
@@ -74,7 +103,17 @@ func HandleGetBatch(c *gin.Context) {
 	c.JSON(http.StatusOK, batch)
 }
 
-// POST /v1/batches/:batch_id/cancel
+// HandleCancelBatch cancels an in-progress batch.
+//
+// @Summary		Cancel batch
+// @Description	Cancels an in-progress batch. In this mock, batches already complete synchronously on creation, so the batch is returned unchanged.
+// @Tags			Batch
+// @Produce		json
+// @Param			batch_id	path		string	true	"Batch ID"
+// @Success		200			{object}	models.Batch
+// @Failure		404			{object}	errs.Response
+// @Security		BearerAuth
+// @Router			/batches/{batch_id}/cancel [post]
 func HandleCancelBatch(c *gin.Context) {
 	id := c.Param("batch_id")
 	batch, ok := store.GetBatch(id)

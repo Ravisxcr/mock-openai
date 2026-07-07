@@ -38,7 +38,16 @@ var knownModels = []modelInfo{
 	{ID: "whisper-1", Object: "model", Created: 1677532384, OwnedBy: "openai-internal"},
 }
 
-// GET /v1/models
+// HandleModels lists the available models.
+//
+// @Summary		List models
+// @Description	Lists the model ids this mock recognizes. Note: chat/embeddings/images/audio endpoints accept any model string, not just these.
+// @Tags			Models
+// @Produce		json
+// @Success		200	{object}	object{object=string,data=[]modelInfo}
+// @Failure		401	{object}	errs.Response
+// @Security		BearerAuth
+// @Router			/models [get]
 func HandleModels(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"object": "list",
@@ -46,7 +55,17 @@ func HandleModels(c *gin.Context) {
 	})
 }
 
-// GET /v1/models/:model_id
+// HandleModel retrieves a single model by id.
+//
+// @Summary		Get model
+// @Description	Retrieves a single model by id, if it's one of the ids returned by List models.
+// @Tags			Models
+// @Produce		json
+// @Param			model_id	path		string	true	"Model ID"
+// @Success		200			{object}	modelInfo
+// @Failure		404			{object}	errs.Response
+// @Security		BearerAuth
+// @Router			/models/{model_id} [get]
 func HandleModel(c *gin.Context) {
 	id := c.Param("model_id")
 	for _, m := range knownModels {

@@ -9,7 +9,19 @@ import (
 	"mock-openai/internal/models"
 )
 
-// POST /v1/images/generations
+// HandleImageGeneration creates an image from a text prompt.
+//
+// @Summary		Create image
+// @Description	Creates an image given a text prompt.
+// @Tags			Images
+// @Accept			json
+// @Produce		json
+// @Param			request	body		models.ImageRequest	true	"Image generation request"
+// @Success		200		{object}	models.ImageResponse
+// @Failure		400		{object}	errs.Response
+// @Failure		401		{object}	errs.Response
+// @Security		BearerAuth
+// @Router			/images/generations [post]
 func HandleImageGeneration(c *gin.Context) {
 	var req models.ImageRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -29,7 +41,21 @@ func HandleImageGeneration(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
-// POST /v1/images/edits (multipart/form-data: image, prompt, ...)
+// HandleImageEdit creates an edited or extended image given an original image and a prompt.
+//
+// @Summary		Create image edit
+// @Description	Creates an edited or extended image given an original image and a prompt.
+// @Tags			Images
+// @Accept			multipart/form-data
+// @Produce		json
+// @Param			image			formData	file	true	"Image to edit"
+// @Param			prompt			formData	string	true	"Description of the desired edit"
+// @Param			response_format	formData	string	false	"url or b64_json"
+// @Success		200				{object}	models.ImageResponse
+// @Failure		400				{object}	errs.Response
+// @Failure		401				{object}	errs.Response
+// @Security		BearerAuth
+// @Router			/images/edits [post]
 func HandleImageEdit(c *gin.Context) {
 	prompt := c.PostForm("prompt")
 	if prompt == "" {
@@ -45,7 +71,20 @@ func HandleImageEdit(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
-// POST /v1/images/variations (multipart/form-data: image, ...)
+// HandleImageVariation creates a variation of a given image.
+//
+// @Summary		Create image variation
+// @Description	Creates a variation of a given image.
+// @Tags			Images
+// @Accept			multipart/form-data
+// @Produce		json
+// @Param			image			formData	file	true	"Image to use as the basis for the variation"
+// @Param			response_format	formData	string	false	"url or b64_json"
+// @Success		200				{object}	models.ImageResponse
+// @Failure		400				{object}	errs.Response
+// @Failure		401				{object}	errs.Response
+// @Security		BearerAuth
+// @Router			/images/variations [post]
 func HandleImageVariation(c *gin.Context) {
 	if _, _, err := c.Request.FormFile("image"); err != nil {
 		errs.InvalidRequest(c, "you must provide an image file", "image")

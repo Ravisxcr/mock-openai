@@ -201,7 +201,7 @@ type ChatRequest struct {
 	Seed                *int64             `json:"seed,omitempty"`
 	User                string             `json:"user,omitempty"`
 	Tools               []ChatTool         `json:"tools,omitempty"`
-	ToolChoice          json.RawMessage    `json:"tool_choice,omitempty"`
+	ToolChoice          json.RawMessage    `json:"tool_choice,omitempty" swaggertype:"object"` // oneOf "none"|"auto"|"required"|{type,function}; documented as object, see openai.yml for the full union
 	ParallelToolCalls   *bool              `json:"parallel_tool_calls,omitempty"`
 }
 

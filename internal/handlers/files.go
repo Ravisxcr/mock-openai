@@ -21,7 +21,20 @@ var validFilePurposes = map[string]bool{
 	"evals":      true,
 }
 
-// POST /v1/files (multipart/form-data: file, purpose, ...)
+// HandleCreateFile uploads a file for use with batch, fine-tuning, assistants, etc.
+//
+// @Summary		Upload file
+// @Description	Uploads a file that can be used across various endpoints (assistants, batch, fine-tune, vision, user_data, evals).
+// @Tags			Files
+// @Accept			multipart/form-data
+// @Produce		json
+// @Param			file	formData	file	true	"File to upload"
+// @Param			purpose	formData	string	true	"assistants, batch, fine-tune, vision, user_data, or evals"
+// @Success		200		{object}	models.FileObject
+// @Failure		400		{object}	errs.Response
+// @Failure		401		{object}	errs.Response
+// @Security		BearerAuth
+// @Router			/files [post]
 func HandleCreateFile(c *gin.Context) {
 	fileHeader, err := c.FormFile("file")
 	if err != nil {
@@ -55,7 +68,17 @@ func HandleCreateFile(c *gin.Context) {
 	c.JSON(http.StatusOK, obj)
 }
 
-// GET /v1/files
+// HandleListFiles lists uploaded files.
+//
+// @Summary		List files
+// @Description	Returns a list of files, optionally filtered by purpose.
+// @Tags			Files
+// @Produce		json
+// @Param			purpose	query		string	false	"Only return files with this purpose"
+// @Success		200		{object}	models.ListFilesResponse
+// @Failure		401		{object}	errs.Response
+// @Security		BearerAuth
+// @Router			/files [get]
 func HandleListFiles(c *gin.Context) {
 	purpose := c.Query("purpose")
 	files := store.ListFiles(purpose)
@@ -72,7 +95,17 @@ func HandleListFiles(c *gin.Context) {
 	})
 }
 
-// GET /v1/files/:file_id
+// HandleGetFile retrieves a file's metadata by id.
+//
+// @Summary		Get file
+// @Description	Returns information about a specific file.
+// @Tags			Files
+// @Produce		json
+// @Param			file_id	path		string	true	"File ID"
+// @Success		200		{object}	models.FileObject
+// @Failure		404		{object}	errs.Response
+// @Security		BearerAuth
+// @Router			/files/{file_id} [get]
 func HandleGetFile(c *gin.Context) {
 	id := c.Param("file_id")
 	obj, ok := store.GetFile(id)
@@ -83,7 +116,16 @@ func HandleGetFile(c *gin.Context) {
 	c.JSON(http.StatusOK, obj)
 }
 
-// DELETE /v1/files/:file_id
+// HandleDeleteFile deletes a file by id.
+//
+// @Summary		Delete file
+// @Tags			Files
+// @Produce		json
+// @Param			file_id	path		string	true	"File ID"
+// @Success		200		{object}	models.DeleteFileResponse
+// @Failure		404		{object}	errs.Response
+// @Security		BearerAuth
+// @Router			/files/{file_id} [delete]
 func HandleDeleteFile(c *gin.Context) {
 	id := c.Param("file_id")
 	if !store.DeleteFile(id) {
@@ -97,7 +139,16 @@ func HandleDeleteFile(c *gin.Context) {
 	})
 }
 
-// GET /v1/files/:file_id/content
+// HandleDownloadFileContent downloads the raw content of a file.
+//
+// @Summary		Download file content
+// @Tags			Files
+// @Produce		application/octet-stream
+// @Param			file_id	path	string	true	"File ID"
+// @Success		200		{file}	binary
+// @Failure		404		{object}	errs.Response
+// @Security		BearerAuth
+// @Router			/files/{file_id}/content [get]
 func HandleDownloadFileContent(c *gin.Context) {
 	id := c.Param("file_id")
 	obj, ok := store.GetFile(id)

@@ -9,7 +9,19 @@ import (
 	"mock-openai/internal/models"
 )
 
-// POST /v1/embeddings
+// HandleEmbeddings creates an embedding vector for the given input.
+//
+// @Summary		Create embeddings
+// @Description	Creates an embedding vector representing the input text.
+// @Tags			Embeddings
+// @Accept			json
+// @Produce		json
+// @Param			request	body		models.EmbeddingRequest	true	"Embedding request"
+// @Success		200		{object}	models.EmbeddingResponse
+// @Failure		400		{object}	errs.Response
+// @Failure		401		{object}	errs.Response
+// @Security		BearerAuth
+// @Router			/embeddings [post]
 func HandleEmbeddings(c *gin.Context) {
 	var req models.EmbeddingRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
